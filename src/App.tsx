@@ -1,11 +1,8 @@
 import { useMemo } from "react";
-import "./App.css";
 import type {
   WrapperConfig,
   MonacoEditorLanguageClientWrapper,
 } from "monaco-editor-wrapper";
-import "@codingame/monaco-vscode-json-default-extension";
-import "@codingame/monaco-vscode-standalone-json-language-features";
 import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
 import { configureDefaultWorkerFactory } from "monaco-editor-wrapper/workers/workerLoaders";
 import {
@@ -13,6 +10,11 @@ import {
   BrowserMessageWriter,
 } from "vscode-jsonrpc/browser";
 import { useWorkerFactory } from "monaco-languageclient/workerFactory";
+
+import "@codingame/monaco-vscode-standalone-json-language-features";
+import "@codingame/monaco-vscode-json-default-extension";
+import "@codingame/monaco-vscode-textmate-service-override";
+
 import TextEditorWorker from "@codingame/monaco-vscode-editor-api/esm/vs/editor/editor.worker?worker";
 import TextMateWorker from "@codingame/monaco-vscode-textmate-service-override/worker?worker";
 import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
@@ -31,7 +33,7 @@ function App() {
   const wrapperConfig = useMemo(() => createWrapperConfig(), []);
 
   return (
-    <div style={{ height: "900px" }}>
+    <div style={{ height: "100vh", width: "100vw" }}>
       <MonacoEditorReactComp
         wrapperConfig={wrapperConfig}
         onLoad={onLoad}

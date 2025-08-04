@@ -23,6 +23,7 @@ export default defineConfig({
     esbuildOptions: {
       plugins: [importMetaUrlPlugin],
     },
+    include: ["vscode-textmate", "vscode-oniguruma"],
   },
 
   worker: {
