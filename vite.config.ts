@@ -23,10 +23,9 @@ export default defineConfig({
     esbuildOptions: {
       plugins: [importMetaUrlPlugin],
     },
-    include: [
-      "@codingame/monaco-vscode-api",
-      "@codingame/monaco-vscode-editor-api",
-      "@codingame/monaco-vscode-json-default-extension",
-    ],
+  },
+
+  worker: {
+    format: "es",
   },
 });
