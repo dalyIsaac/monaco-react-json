@@ -1,0 +1,115 @@
+import { useMemo } from "react";
+import "./App.css";
+import type {
+  WrapperConfig,
+  MonacoEditorLanguageClientWrapper,
+} from "monaco-editor-wrapper";
+import "@codingame/monaco-vscode-json-default-extension";
+import "@codingame/monaco-vscode-standalone-json-language-features";
+import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
+import { defineDefaultWorkerLoaders } from "monaco-editor-wrapper/workers/workerLoaders";
+import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
+import {
+  BrowserMessageReader,
+  BrowserMessageWriter,
+} from "vscode-jsonrpc/browser";
+import { useWorkerFactory } from "monaco-languageclient/workerFactory";
+
+function App() {
+  const onLoad = (monaco: MonacoEditorLanguageClientWrapper) => {
+    console.log("Loaded");
+    const editor = monaco.getEditor();
+    if (editor === undefined) {
+      return;
+    }
+
+    console.log(monaco.getLanguageClient("json"));
+  };
+
+  const wrapperConfig = useMemo(() => createWrapperConfig(), []);
+
+  return (
+    <div style={{ height: "900px" }}>
+      <MonacoEditorReactComp
+        wrapperConfig={wrapperConfig}
+        onLoad={onLoad}
+        style={{ height: "100%" }}
+      />
+    </div>
+  );
+}
+
+const createWrapperConfig = (): WrapperConfig => {
+  const worker = new JsonWorker();
+
+  return {
+    $type: "extended",
+    vscodeApiConfig: {
+      userConfiguration: {
+        json: JSON.stringify({
+          "json.validate.enable": true,
+          "json.schemas": [
+            {
+              uri: "schema-id",
+              fileMatch: ["*"],
+              schema: {
+                type: "object",
+                patternProperties: {
+                  "^(?=.*[A-Za-z0-9])[\\S]*": {
+                    type: "string",
+                    pattern: "^(?=.*[A-Za-z0-9])[\\S]*",
+                  },
+                },
+                additionalProperties: false,
+              },
+            },
+          ],
+        }),
+      },
+    },
+    editorAppConfig: {
+      codeResources: {
+        modified: {
+          text: `{"key": "value"}`,
+          uri: "/workspace/data.json",
+          enforceLanguageId: "json",
+        },
+      },
+      editorOptions: {
+        language: "json",
+      },
+      monacoWorkerFactory: (logger) => {
+        const workerLoaders = defineDefaultWorkerLoaders();
+        workerLoaders["json"] = () => worker;
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useWorkerFactory({
+          workerLoaders,
+          logger,
+        });
+      },
+    },
+    languageClientConfigs: {
+      configs: {
+        json: {
+          clientOptions: {
+            documentSelector: ["json"],
+          },
+          name: "json",
+          connection: {
+            options: {
+              $type: "WorkerDirect",
+              worker,
+            },
+            messageTransports: {
+              reader: new BrowserMessageReader(worker),
+              writer: new BrowserMessageWriter(worker),
+            },
+          },
+        },
+      },
+    },
+  };
+};
+
+export default App;
