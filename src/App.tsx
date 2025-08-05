@@ -5,41 +5,38 @@ import TextEditorWorker from "@codingame/monaco-vscode-editor-api/esm/vs/editor/
 import TextMateWorker from "@codingame/monaco-vscode-textmate-service-override/worker?worker";
 import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 
+import * as monaco from "monaco-editor";
+
 import { configureDefaultWorkerFactory } from "monaco-editor-wrapper/workers/workerLoaders";
 import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
 import { useWorkerFactory } from "monaco-languageclient/workerFactory";
 
-import type {
-  WrapperConfig,
-  MonacoEditorLanguageClientWrapper,
-} from "monaco-editor-wrapper";
+import type { WrapperConfig } from "monaco-editor-wrapper";
+
+monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+  validate: true,
+  allowComments: false,
+  schemas: [
+    {
+      uri: "schema-id",
+      fileMatch: ["*"],
+      schema: {
+        type: "object",
+        patternProperties: {
+          "^(?=.*[A-Za-z0-9])[\\S]*": {
+            type: "string",
+            pattern: "^(?=.*[A-Za-z0-9])[\\S]*",
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+  ],
+});
 
 const createWrapperConfig = (): WrapperConfig => {
   return {
     $type: "classic",
-    vscodeApiConfig: {
-      userConfiguration: {
-        json: JSON.stringify({
-          "json.validate.enable": true,
-          "json.schemas": [
-            {
-              uri: "schema-id",
-              fileMatch: ["*"],
-              schema: {
-                type: "object",
-                patternProperties: {
-                  "^(?=.*[A-Za-z0-9])[\\S]*": {
-                    type: "string",
-                    pattern: "^(?=.*[A-Za-z0-9])[\\S]*",
-                  },
-                },
-                additionalProperties: false,
-              },
-            },
-          ],
-        }),
-      },
-    },
     editorAppConfig: {
       codeResources: {
         modified: {
@@ -70,21 +67,10 @@ const createWrapperConfig = (): WrapperConfig => {
 const wrapperConfig = createWrapperConfig();
 
 function App() {
-  const onLoad = (monaco: MonacoEditorLanguageClientWrapper) => {
-    console.log("Loaded");
-    const editor = monaco.getEditor();
-    if (editor === undefined) {
-      return;
-    }
-
-    console.log(monaco.getLanguageClient("json"));
-  };
-
   return (
     <div style={{ height: "100vh", width: "100vw" }}>
       <MonacoEditorReactComp
         wrapperConfig={wrapperConfig}
-        onLoad={onLoad}
         style={{ height: "100%" }}
       />
     </div>
