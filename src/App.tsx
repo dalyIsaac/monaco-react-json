@@ -1,53 +1,22 @@
-import { useMemo } from "react";
-import type {
-  WrapperConfig,
-  MonacoEditorLanguageClientWrapper,
-} from "monaco-editor-wrapper";
-import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
-import { configureDefaultWorkerFactory } from "monaco-editor-wrapper/workers/workerLoaders";
-import {
-  BrowserMessageReader,
-  BrowserMessageWriter,
-} from "vscode-jsonrpc/browser";
-import { useWorkerFactory } from "monaco-languageclient/workerFactory";
-
+import "@codingame/monaco-vscode-standalone-languages";
 import "@codingame/monaco-vscode-standalone-json-language-features";
-import "@codingame/monaco-vscode-json-default-extension";
-import "@codingame/monaco-vscode-textmate-service-override";
 
 import TextEditorWorker from "@codingame/monaco-vscode-editor-api/esm/vs/editor/editor.worker?worker";
 import TextMateWorker from "@codingame/monaco-vscode-textmate-service-override/worker?worker";
 import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 
-function App() {
-  const onLoad = (monaco: MonacoEditorLanguageClientWrapper) => {
-    console.log("Loaded");
-    const editor = monaco.getEditor();
-    if (editor === undefined) {
-      return;
-    }
+import { configureDefaultWorkerFactory } from "monaco-editor-wrapper/workers/workerLoaders";
+import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
+import { useWorkerFactory } from "monaco-languageclient/workerFactory";
 
-    console.log(monaco.getLanguageClient("json"));
-  };
-
-  const wrapperConfig = useMemo(() => createWrapperConfig(), []);
-
-  return (
-    <div style={{ height: "100vh", width: "100vw" }}>
-      <MonacoEditorReactComp
-        wrapperConfig={wrapperConfig}
-        onLoad={onLoad}
-        style={{ height: "100%" }}
-      />
-    </div>
-  );
-}
+import type {
+  WrapperConfig,
+  MonacoEditorLanguageClientWrapper,
+} from "monaco-editor-wrapper";
 
 const createWrapperConfig = (): WrapperConfig => {
-  const worker = new JsonWorker();
-
   return {
-    $type: "extended",
+    $type: "classic",
     vscodeApiConfig: {
       userConfiguration: {
         json: JSON.stringify({
@@ -82,40 +51,44 @@ const createWrapperConfig = (): WrapperConfig => {
       editorOptions: {
         language: "json",
       },
-      monacoWorkerFactory: (logger) => {
+      monacoWorkerFactory: () => {
         configureDefaultWorkerFactory();
+
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useWorkerFactory({
           workerLoaders: {
             TextEditorWorker: () => new TextEditorWorker(),
             TextMateWorker: () => new TextMateWorker(),
-            json: () => worker,
+            json: () => new JsonWorker(),
           },
-          logger,
         });
-      },
-    },
-    languageClientConfigs: {
-      configs: {
-        json: {
-          clientOptions: {
-            documentSelector: ["json"],
-          },
-          name: "json",
-          connection: {
-            options: {
-              $type: "WorkerDirect",
-              worker,
-            },
-            messageTransports: {
-              reader: new BrowserMessageReader(worker),
-              writer: new BrowserMessageWriter(worker),
-            },
-          },
-        },
       },
     },
   };
 };
+
+const wrapperConfig = createWrapperConfig();
+
+function App() {
+  const onLoad = (monaco: MonacoEditorLanguageClientWrapper) => {
+    console.log("Loaded");
+    const editor = monaco.getEditor();
+    if (editor === undefined) {
+      return;
+    }
+
+    console.log(monaco.getLanguageClient("json"));
+  };
+
+  return (
+    <div style={{ height: "100vh", width: "100vw" }}>
+      <MonacoEditorReactComp
+        wrapperConfig={wrapperConfig}
+        onLoad={onLoad}
+        style={{ height: "100%" }}
+      />
+    </div>
+  );
+}
 
 export default App;
