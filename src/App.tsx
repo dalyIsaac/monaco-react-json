@@ -16,23 +16,9 @@ import type { WrapperConfig } from "monaco-editor-wrapper";
 monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
   validate: true,
   allowComments: false,
-  schemas: [
-    {
-      uri: "schema-id",
-      fileMatch: ["*"],
-      schema: {
-        type: "object",
-        patternProperties: {
-          "^(?=.*[A-Za-z0-9])[\\S]*": {
-            type: "string",
-            pattern: "^(?=.*[A-Za-z0-9])[\\S]*",
-          },
-        },
-        additionalProperties: false,
-      },
-    },
-  ],
 });
+
+console.log(monaco.languages.json);
 
 const createWrapperConfig = (): WrapperConfig => {
   return {
