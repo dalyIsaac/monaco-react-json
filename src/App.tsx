@@ -4,7 +4,7 @@ import "@codingame/monaco-vscode-textmate-service-override";
 
 import TextEditorWorker from "@codingame/monaco-vscode-editor-api/esm/vs/editor/editor.worker?worker";
 import TextMateWorker from "@codingame/monaco-vscode-textmate-service-override/worker?worker";
-import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
+import JsonWorker from "@codingame/monaco-vscode-standalone-json-language-features/worker?worker";
 
 import type { WrapperConfig } from "monaco-editor-wrapper";
 import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
