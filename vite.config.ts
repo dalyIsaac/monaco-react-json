@@ -14,6 +14,7 @@ export default defineConfig({
     include: ["vscode-textmate", "vscode-oniguruma"],
     exclude: [
       "@codingame/monaco-vscode-json-language-features-default-extension",
+      "monaco-editor",
     ],
   },
 
