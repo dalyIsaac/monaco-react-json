@@ -1,29 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 import importMetaUrlPlugin from "@codingame/esbuild-import-meta-url-plugin";
 import vsixPlugin from "@codingame/monaco-vscode-rollup-vsix-plugin";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vsixPlugin(),
-    react(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: "node_modules/@codingame/monaco-vscode-json-default-extension/resources",
-          dest: "resources",
-        },
-      ],
-    }),
-  ],
+  plugins: [vsixPlugin(), react()],
 
   optimizeDeps: {
     esbuildOptions: {
       plugins: [importMetaUrlPlugin],
     },
     include: ["vscode-textmate", "vscode-oniguruma"],
+    exclude: [
+      "@codingame/monaco-vscode-json-language-features-default-extension",
+    ],
   },
 
   worker: {
