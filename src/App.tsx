@@ -3,7 +3,7 @@ import "@codingame/monaco-vscode-standalone-json-language-features";
 
 import TextEditorWorker from "@codingame/monaco-vscode-editor-api/esm/vs/editor/editor.worker?worker";
 import TextMateWorker from "@codingame/monaco-vscode-textmate-service-override/worker?worker";
-import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
+import JsonWorker from "@codingame/monaco-vscode-standalone-json-language-features/worker?worker";
 
 import * as monaco from "monaco-editor";
 
@@ -16,6 +16,22 @@ import type { WrapperConfig } from "monaco-editor-wrapper";
 monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
   validate: true,
   allowComments: false,
+  schemas: [
+    {
+      uri: "schema-id",
+      fileMatch: ["*"],
+      schema: {
+        type: "object",
+        patternProperties: {
+          "^(?=.*[A-Za-z0-9])[\\S]*": {
+            type: "string",
+            pattern: "^(?=.*[A-Za-z0-9])[\\S]*",
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+  ],
 });
 
 console.log(monaco.languages.json);
