@@ -16,7 +16,7 @@
     "@typefox/monaco-editor-react": "~6.9.0",
     "react": "~19.1.0",
     "react-dom": "~19.1.0",
-    "vite-plugin-static-copy": "^3.1.1"
+    "vite-plugin-static-copy": "^3.1.2"
   },
   "devDependencies": {
     "@codingame/esbuild-import-meta-url-plugin": "~1.0.3",
